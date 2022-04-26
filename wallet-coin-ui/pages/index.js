@@ -1,4 +1,5 @@
 import Header from '../components/Header'
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default function Home() {
@@ -16,23 +17,31 @@ export default function Home() {
           </span>
           </div>
         </div>
-        <img src="/Explore-illo.svg" className="flex-1 flex-shrink-0" />
+        <Image
+            src="/Explore-illo.svg"
+            alt="Picture of the author"
+            width={700}
+            height={700}
+          />
+        
       </div>
 
 
       <div className="container flex p-0 mt-8">
-        <div className="flex items-center flex-1 mr-4 rounded-md h-72" style={{ backgroundColor: "#5a78f0" }}>
-          <div className="w-32"><img className="ml-auto" src="/createwallet.png" style={{ width: "87px", height: "87px" }} /></div>
+        <div className="flex items-center flex-1 mr-4 transition duration-300 transform rounded-md h-72 hover:-translate-y-2" style={{ backgroundColor: "#5a78f0" }}>
+          <div className="w-32">
+            <img className="ml-auto" src="/createwallet.png" style={{ width: "87px", height: "87px" }} alt="123" />
+            </div>
           <div className="flex flex-col flex-1 flex-shrink-0 px-10">
             <span className="text-2xl font-medium text-white">Create New Wallet</span>
             <span className="mt-2 text-white text-md"> Generate your own unique Ethereum wallet. Receive a public address (0x...) and choose a method for access and recovery. </span>
             
             <button className="self-start mt-6 text-white">
-              <Link href="/create-wallet" className="self-start mt-10 text-white">Get Started</Link>
+              <Link href="/create-wallet"><span className="self-start mt-6 text-white cursor-pointer ">Get Started</span></Link>
             </button>
           </div>
         </div>
-        <div className="flex items-center flex-1 ml-4 rounded-md h-72" style={{ backgroundColor: "#05c0a5" }}>
+        <div className="flex items-center flex-1 ml-4 transition duration-300 transform rounded-md h-72 hover:-translate-y-2 " style={{ backgroundColor: "#05c0a5" }}>
 
           <div className="w-32"><img className="ml-auto" src="/accesswallet.png" style={{ width: "87px", height: "87px" }} /></div>
           <div className="flex flex-col flex-1 flex-shrink-0 px-10">
