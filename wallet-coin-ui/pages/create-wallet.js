@@ -16,7 +16,6 @@ export default function CreateWallet() {
   const [isSuccess, setSuccess] = useState(false)
   const ref = useRef()
   const cancelButtonRef = useRef()
-
   useEffect(() => {
     import('../lib/bip39').then(myModule => {
       ref.current = myModule;
@@ -73,11 +72,9 @@ export default function CreateWallet() {
         <div >
           <Header />
 
-          <div className="mt-16 text-center">
-            <h1 className="text-3xl font-light">Get a New Wallet</h1>
-            <span className="font-light text-gray-600">Already have a wallet ? Access My Wallet</span>
-
-
+          <div className="pb-16 mt-16 text-center">
+            <h1 className="text-3xl font-light">Access Your Wallet</h1>
+            <span className="font-light text-gray-600">Do not have a wallet ? Create New</span>
 
             <div className="flex mx-auto mt-10 bg-white rounded-lg shadow-sm" style={customWidth}>
               <div className="flex-1 py-4 text-center text-gray-500 border-b-2 hover:border-purple-300">Keystore File</div>
