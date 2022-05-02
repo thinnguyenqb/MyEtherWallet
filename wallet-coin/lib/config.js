@@ -8,20 +8,20 @@ module.exports = {
   TRANSACTIONS_PER_BLOCK: 2,
   genesisBlock: {
     index: 0,
-    previousHash: '0',
+    previousHash: "0",
     timestamp: 1465154705,
     nonce: 0,
     transactions: [
       {
-        id: '63ec3ac02f822450039df13ddf7c3c0f19bab4acd4dc928c62fcd78d5ebc6dba',
+        id: "63ec3ac02f822450039df13ddf7c3c0f19bab4acd4dc928c62fcd78d5ebc6dba",
         hash: null,
-        type: 'regular',
+        type: "regular",
         data: {
           inputs: [],
-          outputs: []
-        }
-      }
-    ]
+          outputs: [],
+        },
+      },
+    ],
   },
   pow: {
     getDifficulty: (blocks, index) => {
@@ -32,11 +32,14 @@ module.exports = {
 
       return Math.max(
         Math.floor(
-          BASE_DIFFICULTY / Math.pow(
-            Math.floor(((index || blocks.length) + 1) / EVERY_X_BLOCKS) + 1
-            , POW_CURVE)
-        )
-        , 0);
-    }
-  }
+          BASE_DIFFICULTY /
+            Math.pow(
+              Math.floor(((index || blocks.length) + 1) / EVERY_X_BLOCKS) + 1,
+              POW_CURVE
+            )
+        ),
+        0
+      );
+    },
+  },
 };
