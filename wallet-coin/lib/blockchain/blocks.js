@@ -1,5 +1,5 @@
-const Block = require("./block");
-const R = require("ramda");
+const Block = require('./block');
+const R = require('ramda');
 
 class Blocks extends Array {
   static fromJson(data) {
