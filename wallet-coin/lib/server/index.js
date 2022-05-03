@@ -88,15 +88,6 @@ class HttpServer {
       res.status(200).send(transactionFromBlock);
     });
 
-    this.app.get('/blockchain/transactions', (req, res) => {
-      if (req.headers['accept'] && req.headers['accept'].includes('text/html'))
-        res.render('blockchain/transactions/index.pug', {
-          pageTitle: 'Unconfirmed Transactions',
-          transactions: blockchain.getAllTransactions(),
-        });
-      else res.status(200).send(blockchain.getAllTransactions());
-    });
-
     this.app.post('/blockchain/transactions', (req, res) => {
       let requestTransaction = Transaction.fromJson(req.body);
       let transactionFound = blockchain.getTransactionById(requestTransaction.id);
@@ -112,6 +103,10 @@ class HttpServer {
           throw new HTTPError(400, ex.message, requestTransaction, ex);
         else throw ex;
       }
+    });
+
+    this.app.get('/blockchain/transactions', (req, res) => {
+      res.status(200).send(blockchain.getAllTransactions());
     });
 
     this.app.get('/blockchain/transactions/unspent', (req, res) => {

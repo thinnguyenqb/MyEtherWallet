@@ -106,5 +106,3 @@ class TransactionBuilder {
 }
 
 module.exports = TransactionBuilder;
- 91  
-lib/operator/wallet.js
