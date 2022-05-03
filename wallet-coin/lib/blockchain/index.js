@@ -74,6 +74,10 @@ class Blockchain {
     return this.transactions;
   }
 
+  getAllRegularTransactions() {
+    return this.transactions.filter((tx) => tx.type === 'regular');
+  }
+
   getTransactionById(id) {
     return R.find(R.propEq("id", id), this.transactions);
   }
@@ -90,7 +94,7 @@ class Blockchain {
     for (let tx of this.transactions) {
       const inpArr = tx.data.inputs;
       const outArr = tx.data.outputs;
-      const havingAddress = inpArr.find(el => el.address === publicAddress) || outArr.find(el => el.address === publicAddress)
+      const havingAddress = inpArr.some(el => el.address === publicAddress) || outArr.some(el => el.address === publicAddress)
       if (havingAddress) result.push(tx)
     }
     return result;

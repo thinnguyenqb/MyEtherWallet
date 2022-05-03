@@ -105,8 +105,12 @@ class HttpServer {
       }
     });
 
-    this.app.get('/blockchain/transactions', (req, res) => {
+    this.app.get('/blockchain/transactions/regular', (req, res) => {
       res.status(200).send(blockchain.getAllTransactions());
+    });
+
+    this.app.get('/blockchain/transactions', (req, res) => {
+      res.status(200).send(blockchain.getTransactionByAddress(req.query.address));
     });
 
     this.app.get('/blockchain/transactions/unspent', (req, res) => {
