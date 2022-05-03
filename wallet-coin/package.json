@@ -6,7 +6,8 @@
     "elliptic": "^6.5.4",
     "es6-error": "^4.1.1",
     "express": "^4.18.1",
-    "ramda": "^0.27.2"
+    "ramda": "^0.27.2",
+    "timeago.js": "^4.0.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
