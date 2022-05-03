@@ -46,6 +46,7 @@ class Miner {
       R.replace(/"/g, "")
     )(baseBlock.transactions);
 
+    console.log(thread)
     console.info(
       `Mining a new block with ${baseBlock.transactions.length} (${transactionList}) transactions`
     );

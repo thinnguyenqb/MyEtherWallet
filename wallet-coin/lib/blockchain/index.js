@@ -4,9 +4,9 @@ const Db = require("../util/db");
 const Blocks = require("./blocks");
 const Block = require("./block");
 const Transactions = require("./transactions");
-const TransactionAssertionError = require('./transactionAssert');
-const BlockAssertionError = require('./blockAssert');
-const BlockchainAssertionError = require('./blockchainAssert');
+const TransactionAssertionError = require("./transactionAssert");
+const BlockAssertionError = require("./blockAssert");
+const BlockchainAssertionError = require("./blockchainAssert");
 const Config = require("../config");
 
 // Database settings
@@ -411,7 +411,7 @@ class Blockchain {
       R.pipe(R.prop("transactions"), R.forEach(selectTxs)),
       this.blocks
     );
-    R.forEach(selectTxs, this.transactions);
+    // R.forEach(selectTxs, this.transactions);
 
     // Cross both lists and find transactions outputs without a corresponding transaction input
     let unspentTransactionOutput = [];

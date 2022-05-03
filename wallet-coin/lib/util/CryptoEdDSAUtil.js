@@ -14,8 +14,7 @@ class CryptoEdDSAUtil {
   }
 
   static generateKeyPairFromSecret(secret) {
-    // Create key pair from secret
-    let keyPair = ec.keyFromSecret(secret); // hex string, array or Buffer
+    let keyPair = ec.keyFromSecret(secret);
     console.debug(`Public key: \n${elliptic.utils.toHex(keyPair.getPublic())}`);
     return keyPair;
   }
@@ -27,7 +26,7 @@ class CryptoEdDSAUtil {
   }
 
   static verifySignature(publicKey, signature, messageHash) {
-    let key = ec.keyFromPublic(publicKey, "hex");
+    let key = ec.keyFromSecret(publicKey, "hex");
     let verified = key.verify(messageHash, signature);
     console.debug(`Verified: ${verified}`);
     return verified;
