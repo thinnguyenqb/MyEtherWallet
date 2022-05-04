@@ -1,7 +1,15 @@
 import Link from 'next/link'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Header from '../../components/Header'
-import { ChipIcon, QrcodeIcon, CurrencyDollarIcon, InformationCircleIcon } from '@heroicons/react/outline'
+import {
+  ChipIcon,
+  QrcodeIcon,
+  CurrencyDollarIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/outline'
+import { useWallet } from '../../util/store'
+import {useRouter} from 'next/router'
+import instance from '../../util/axios'
 const gridStyle = {
   gridColumnGap: 0,
   gridTemplateColumns: '270px 1fr',
@@ -31,6 +39,19 @@ const HeaderRight = ({ className }) => {
 }
 
 export default function Dashboard() {
+  const { wallet, change } = useWallet()
+  const router = useRouter()
+  useEffect(() => {
+    if (!wallet.address) {
+        router.replace('/access-wallet')
+    }
+    ;(async () => {
+      try {
+        const { data } = await instance.get('operator/' + wallet.address + '/balance')
+        change(data)
+      } catch (err) {}
+    })()
+  }, [wallet?.address])
   return (
     <div className="flex flex-col h-screen">
       <Header container={false} right={HeaderRight} />
@@ -52,30 +73,30 @@ export default function Dashboard() {
               className="flex h-40 px-10 rounded-md shadow-sm py-7"
               style={{ backgroundColor: '#7070e3' }}
             >
-              <QrcodeIcon className="w-12 h-12 mt-2 mr-5 text-white" />
+              <QrcodeIcon className="flex-shrink-0 w-12 h-12 mt-2 mr-5 text-white" />
               <div className="flex flex-col text-white">
                 <span className="text-lg font-semibold">Address</span>
-                <span className="text-sm text-white break-all">
-                  0xc5ccA20Bd103636Fe4668C669F02Cd1a5F2acd80
-                </span>
+                <span className="text-sm text-white break-all">{wallet.address}</span>
               </div>
             </div>
-            <div className="flex h-40 px-10 rounded-md shadow-sm py-7" style={{ backgroundColor: '#5a78f0' }}>
+            <div
+              className="flex h-40 px-10 rounded-md shadow-sm py-7"
+              style={{ backgroundColor: '#5a78f0' }}
+            >
               <CurrencyDollarIcon className="flex-shrink-0 w-12 h-12 mt-2 mr-5 text-white" />
               <div className="flex flex-col text-white">
                 <span className="text-lg font-semibold">Balance</span>
-                <span className="text-2xl font-light text-white break-all">
-                  79098
-                </span>
+                <span className="text-2xl font-light text-white break-all">{wallet.balance}</span>
               </div>
             </div>
-            <div className="flex h-40 px-10 rounded-md shadow-sm py-7" style={{ backgroundColor: '#25b0e8' }}>
+            <div
+              className="flex h-40 px-10 rounded-md shadow-sm py-7"
+              style={{ backgroundColor: '#25b0e8' }}
+            >
               <InformationCircleIcon className="w-12 h-12 mt-2 mr-5 text-white" />
               <div className="flex flex-col text-white">
                 <span className="text-lg font-semibold">Network</span>
-                <span className="text-sm text-white break-all">
-                  Dsdfsdfsdfsdfsdfsdf
-                </span>
+                <span className="text-sm text-white break-all">Deo biet ghi gi</span>
               </div>
             </div>
           </div>
@@ -89,4 +110,3 @@ export default function Dashboard() {
     </div>
   )
 }
- 

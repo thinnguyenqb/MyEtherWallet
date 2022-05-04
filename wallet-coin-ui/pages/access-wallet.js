@@ -6,6 +6,10 @@ import { Dialog } from '@headlessui/react'
 import _ from 'lodash'
 import axios from '../util/axios'
 import Link from 'next/link'
+import { useWallet } from '../util/store'
+import { useRouter } from 'next/router'
+import { route } from 'next/dist/next-server/server/router'
+
 const customWidth = { width: '28rem' }
 
 export default function CreateWallet() {
@@ -17,7 +21,9 @@ export default function CreateWallet() {
   const [phraseValidation, setPhraseValidation] = useState(null)
   const [isSuccess, setSuccess] = useState(false)
   const ref = useRef()
+  const router = useRouter()
   const cancelButtonRef = useRef()
+  const { wallet: z, change } = useWallet()
   useEffect(() => {
     import('../lib/bip39').then((myModule) => {
       ref.current = myModule
@@ -32,6 +38,8 @@ export default function CreateWallet() {
       setPhrase(ref.current.default.generate(128).split(' '))
     }
   }
+
+  const textareaRef = useRef(null)
 
   const handleModalOpen = () => {
     if (!isModalOpen) {
@@ -54,6 +62,11 @@ export default function CreateWallet() {
     setModalOpen((prev) => !prev)
   }
 
+  useEffect(() => {
+    if (z.address) {
+      router.replace('/interface/dashboard')
+    }
+  }, [z])
   const handleVerifyPhrase = () => {
     const isEqual = _.isEqual(phraseValidation, phrase)
     if (!isEqual) {
@@ -79,6 +92,22 @@ export default function CreateWallet() {
     }
   }, [tab])
 
+  const handleLogin = async () => {
+    if (!textareaRef.current) return
+    const { data } = await axios.get('operator/wallets/' + textareaRef.current.value)
+    change({ address: data })
+
+    router.replace('/interface/dashboard')
+  }
+
+  const handleKeyDown = (ev) => {
+    
+    if (ev.key == 'Enter') {
+      ev.preventDefault();
+      handleLogin()
+    }
+  }
+
   return (
     <>
       <div className="min-h-screen bg-gray-100">
@@ -86,9 +115,9 @@ export default function CreateWallet() {
           <Header />
 
           <div className="pb-16 mt-16 text-center">
-            <h1 className="text-3xl font-light">Get a New Wallet</h1>
+            <h1 className="text-3xl font-light">Access Your Wallet</h1>
             <span className="font-light text-gray-600">
-              Already have a wallet ? Access My Wallet
+              Do not have any wallet? Create new one!
             </span>
 
             <div className="flex mx-auto mt-10 bg-white rounded-lg shadow-sm" style={customWidth}>
@@ -123,38 +152,27 @@ export default function CreateWallet() {
                 style={customWidth}
               >
                 <div className="text-xl font-medium text-center">Your Private Key(s) </div>
-                <button
-                  onClick={handleGenNewWallet}
-                  className="self-end text-xs text-blue-500 focus:outline-none"
-                >
-                  Random
-                </button>
+
                 <div className="flex flex-col w-full pt-4 mt-5 text-left gap-x-4 pb-7">
                   <span className="mb-3 text-sm font-semibold">Private Key</span>
-                  <input
+                  <textarea
+                    ref={textareaRef}
+                    onKeyPress={handleKeyDown}
                     className="px-4 py-2 mt-2 border border-gray-200 rounded-md shadow-sm overflow-ellipsis"
-                    value={wallet?.privateKey}
-                  ></input>
-                  <span className="mt-8 mb-3 text-sm font-semibold">Public Key</span>
-                  <input
-                    className="px-4 py-2 mt-2 border border-gray-200 rounded-md shadow-sm"
-                    value={wallet?.publicKey}
-                  ></input>
-                  <span className="mt-8 mb-3 text-sm font-semibold">Address</span>
-                  <input
-                    className="px-4 py-2 mt-2 border border-gray-200 rounded-md shadow-sm"
-                    value={wallet?.address}
-                  ></input>
+                    placeholder="Input your private key."
+                  ></textarea>
                 </div>
-                <Link href="/access-wallet">
-                  <span className="w-full py-5 font-medium text-white bg-green-600 rounded-lg">
-                    I Wrote Down My Private Key
-                  </span>
-                </Link>
+
+                <button
+                  onClick={handleLogin}
+                  className="w-full py-5 font-medium text-white bg-green-600 rounded-lg"
+                >
+                  Access Wallet
+                </button>
 
                 <p className="mt-5 text-sm font-medium text-gray-600">
-                  <span className="text-red-700">DO NOT FORGET</span> to save your private key. You
-                  will need this to access your wallet.
+                  <span className="text-red-700">Please</span> keep up your private key. You will
+                  need this to access your wallet.
                 </p>
               </div>
             )}
