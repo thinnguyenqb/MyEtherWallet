@@ -32,7 +32,7 @@ const avatarStyle = {
 const HeaderRight = ({ className }) => {
   return (
     <div className="flex items-center h-full ml-auto">
-      <Link href="/scan" className="mr-6">
+      <Link href="/explorer" className="mr-6">
         <span className="mr-6 font-light text-gray-800">
           Transaction History{" "}
         </span>

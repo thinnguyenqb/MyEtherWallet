@@ -1,6 +1,7 @@
 import fromnow from 'fromnow'
-import Header from '../components/Header'
-import instance from '../util/axios'
+import Header from '../../components/Header'
+import instance from '../../util/axios'
+import Link from 'next/link'
 export default function Explorer({ blocks, transactions }) {
   console.log(transactions)
   return (
@@ -16,7 +17,7 @@ export default function Explorer({ blocks, transactions }) {
           <div className="flex flex-col">
             <div className="flex items-center justify-between">
               <span className="text-xl font-medium text-gray-800">Latest Blocks</span>
-              <button className="px-4 py-1 text-blue-600 border border-gray-300 rounded-lg">View All</button>
+              <Link href={"/explorer/blocks"}><span className="px-4 py-1 text-blue-600 border border-gray-300 rounded-lg">View All</span></Link>
             </div>
             <span className="text-sm font-medium text-gray-600">The most recently mined blocks</span>
 
@@ -27,12 +28,15 @@ export default function Explorer({ blocks, transactions }) {
               <div className="text-sm text-gray-500" style={{ width: "17%" }}>Nonce</div>
             </div>
 
-            {blocks?.length > 0 && blocks.map(block => <div key={block.index} className="flex w-full mt-6">
-              <div className="text-sm text-gray-800" style={{ width: "18%" }}>{block.index}</div>
+            {blocks?.length > 0 && blocks.map(block => {
+              const wlurl = block?.transactions.find(tx => tx.type === 'reward')?.data?.outputs[0]?.address || "Genesis Block";
+              return <div key={block.index} className="flex w-full mt-6">
+              <Link href={"/explorer/blocks/" + block.index}><div className="text-sm text-blue-500 hover:cursor-pointer hover:underline" style={{ width: "18%" }}>{block.index}</div></Link>
               <div className="text-sm text-gray-800" style={{ width: "25%" }}>{fromnow(Number(block.timestamp) * 1000)}</div>
-              <div className="text-sm text-gray-800 break-all" style={{ width: "40%" }}>{block.transactions[0].data.outputs[0].address}</div>
+              <Link href={"/explorer/wallet/" + wlurl}><div className="text-sm text-blue-500 break-all hover:cursor-pointer hover:underline" style={{ width: "40%" }}>{wlurl}</div></Link>
               <div className="text-sm text-gray-800" style={{ width: "17%" }}>{block.nonce}</div>
-            </div>)}
+            </div>
+            })}
           </div>
           <div className="flex flex-col mt-16 mb-16">
             <div className="flex items-center justify-between">
@@ -50,7 +54,7 @@ export default function Explorer({ blocks, transactions }) {
             {transactions?.length > 0 && transactions.map(tx => <div key={tx.id} className="flex w-full mt-6">
               <div className="pr-2 text-sm text-gray-800 break-all" style={{ width: "40%" }}>{tx.hash}</div>
               <div className="text-sm text-gray-800" style={{ width: "25%" }}>{fromnow(Number(tx.time) * 1000)}</div>
-              <div className="text-sm text-gray-800 break-all" style={{ width: "25%" }}>{tx.data.outputs[0].amount}</div>
+              <div className="text-sm text-gray-800 break-all" style={{ width: "25%" }}>{tx.data.inputs.reduce((prev, cur) => prev.amount > Number(cur.amount) ? prev : cur, {amount: 0}).amount}</div>
               <div className="text-sm text-gray-800" style={{ width: "10%" }}>{tx.type}</div>
             </div>)}
           </div>
@@ -63,7 +67,7 @@ export default function Explorer({ blocks, transactions }) {
 
 Explorer.getInitialProps = async () => {
   const { data } = await instance.get('blockchain/blocks')
-  const {data : tdata} = await instance.get('blockchain/transactions')
+  const {data : tdata} = await instance.get('blockchain/transactions/regular')
   
   return { blocks: data.slice(Math.max(data.length - 8, 0)).reverse(), transactions :  tdata.slice(Math.max(tdata.length - 8, 0)).reverse()}
 }
