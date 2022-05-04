@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Header from "../../components/Header";
 import {
   ChipIcon,
@@ -7,11 +7,13 @@ import {
   CurrencyDollarIcon,
   InformationCircleIcon,
   RefreshIcon,
+  CogIcon,
 } from "@heroicons/react/outline";
 import { useWallet } from "../../util/store";
 import { useRouter } from "next/router";
 import instance from "../../util/axios";
 import { last } from "lodash";
+import { data } from "autoprefixer";
 const gridStyle = {
   gridColumnGap: 0,
   gridTemplateColumns: "270px 1fr",
@@ -42,23 +44,34 @@ const HeaderRight = ({ className }) => {
   );
 };
 
+const initialState = { amount: 0, address: "", error: "" };
+
 export default function Dashboard() {
   const { wallet, change } = useWallet();
   const router = useRouter();
   const [lastestBlock, setLatestBlock] = useState(null);
-  const [formValue, setForm] = useState({ amount: 0, address: "", error: "" });
+  const [formValue, setForm] = useState(() => initialState);
+  const [transactions, setTransactions] = useState([]);
+  const [mine, setMine] = useState({ status: "pending" });
+  const amountRef = useRef(null);
+  const walletRef = useRef(null);
   useEffect(() => {
     if (!wallet.address) {
       router.replace("/access-wallet");
     }
     (async () => {
       refreshBalance();
-      try {
-        const { data } = await instance.get("/blockchain/blocks/latest");
-        setLatestBlock(data);
-      } catch (err) {}
+      getLatestBlock();
+      //refreshTransaction()
     })();
   }, [wallet?.address]);
+
+  const getLatestBlock = async () => {
+    try {
+      const { data } = await instance.get("/blockchain/blocks/latest");
+      setLatestBlock(data);
+    } catch (err) {}
+  };
 
   const refreshBalance = async () => {
     try {
@@ -69,28 +82,54 @@ export default function Dashboard() {
     } catch (err) {}
   };
 
+  const refreshTransaction = async () => {
+    try {
+      const { data } = await instance.get(
+        "/blockchain/transactions?address=" + wallet.address
+      );
+      setTransactions(data);
+    } catch (err) {}
+  };
+
   const handleChangeForm = useCallback((ev) => {
     setForm((prev) => ({ ...prev, [ev.target.name]: ev.target.value }));
   }, []);
 
-  const onFormSubmit = useCallback(async (ev) => {
+  const handleMining = async () => {
+    setMine({ status: "mining", data: null });
+    try {
+      const { data } = await instance.post("/miner/mine", {
+        rewardAddress: wallet.address,
+      });
+      setMine({ status: "pending", data });
+      refreshBalance();
+      getLatestBlock();
+    } catch (err) {}
+  };
+
+  console.log(formValue);
+
+  const onFormSubmit = async (ev) => {
     ev.preventDefault();
 
     try {
-      console.log(formValue);
-
-      const { data } = await instance.post("/operator/wallets/transactions", {
+      await instance.post("/operator/wallets/transactions", {
         fromAddress: wallet.address,
         toAddress: formValue.address,
         amount: Number(formValue.amount),
       });
-      console.log(data);
+      setForm({ ...initialState, success: true });
     } catch (err) {
-      setForm((prev) => ({ ...prev, error: err.response.data }));
+      if (err.response)
+        setForm((prev) => ({
+          ...prev,
+          error: err.response.data,
+          success: false,
+        }));
     }
-  }, []);
+  };
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen max-h-screen">
       <Header container={false} right={HeaderRight} />
 
       <div className="grid flex-1 w-full bg-gray-200">
@@ -147,8 +186,33 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="grid flex-1 w-full grid-cols-3 gap-5 mt-5">
-            <div className="p-6 bg-white rounded-md">
-              <span className="font-semibold text-md">My Transactions</span>
+            <div className="relative w-full max-h-full p-6 overflow-y-auto bg-white rounded-md">
+              <span className="font-semibold text-md">Mine Block</span>
+              <div className="flex flex-col items-center px-5">
+                <CogIcon
+                  className={`w-32 h-32 mx-auto mt-12 font-light text-gray-500 ${
+                    mine.status === "mining" ? "animate-spin" : ""
+                  }`}
+                />
+                <button
+                  onClick={handleMining}
+                  disabled={mine.status === "mining"}
+                  className="mx-auto mt-6 font-light text-center text-gray-500 focus:outline-none"
+                >
+                  Start Mining
+                </button>
+                {mine.data && (
+                  <span className="mt-5 text-green-600">Success</span>
+                )}
+                {mine.data && (
+                  <span className="w-2/3 text-sm break-all">
+                    Hash : {mine.data.hash}
+                  </span>
+                )}
+                {mine.data && (
+                  <span className="text-sm">Nonce : {mine.data.nonce}</span>
+                )}
+              </div>
             </div>
             <div className="flex flex-col col-span-2 p-6 bg-white rounded-md">
               <span className="font-semibold text-md">Create Transaction</span>
@@ -159,7 +223,9 @@ export default function Dashboard() {
                 <input
                   className="px-4 py-2 mt-1 border border-gray-200 rounded-md shadow-sm overflow-ellipsis focus:outline-none"
                   defaultValue={1}
+                  ref={amountRef}
                   autoFocus
+                  value={formValue.amount}
                   name="amount"
                   type="number"
                   min={1}
@@ -173,8 +239,9 @@ export default function Dashboard() {
                   className="px-4 py-2 mt-1 border border-gray-200 rounded-md shadow-sm overflow-ellipsis focus:outline-none"
                   placeholder="Please enter receiver address"
                   type="text"
+                  ref={walletRef}
                   name="address"
-                  defaultValue={formValue.address}
+                  value={formValue.address}
                   onChange={handleChangeForm}
                   required
                   pattern="^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$"
@@ -190,6 +257,11 @@ export default function Dashboard() {
                 {formValue.error && (
                   <span className="mt-5 text-sm font-semibold text-center text-red-500">
                     {formValue.error}
+                  </span>
+                )}
+                {formValue.success && (
+                  <span className="mt-5 text-sm font-semibold text-center text-green-600">
+                    Success
                   </span>
                 )}
               </form>

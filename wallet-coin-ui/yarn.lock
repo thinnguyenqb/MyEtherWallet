@@ -874,6 +874,11 @@
   "resolved" "https://registry.npmjs.org/fraction.js/-/fraction.js-4.2.0.tgz"
   "version" "4.2.0"
 
+"fromnow@^3.0.1":
+  "integrity" "sha512-yiLiFONFTvJlP4NaaYcJclCExN4wa2EbWJ9cCXqKcFdxkBmiqlDhzGb/yJ8HtvhNh9td7AUwyCW9w9RrLi429A=="
+  "resolved" "https://registry.npmjs.org/fromnow/-/fromnow-3.0.1.tgz"
+  "version" "3.0.1"
+
 "fs.realpath@^1.0.0":
   "integrity" "sha1-FQStJSMVjKpA20onh8sBQRmU6k8="
   "resolved" "https://registry.npmjs.org/fs.realpath/-/fs.realpath-1.0.0.tgz"
