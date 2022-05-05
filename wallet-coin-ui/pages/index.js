@@ -10,10 +10,10 @@ export default function Home() {
       <div className="container flex mt-12">
         <div className="h-full my-auto">
           <div>
-            <h1 className="text-5xl font-bold leading-tight text-gray-800">GITCOIN</h1>
+            <h1 className="text-5xl font-bold leading-tight text-gray-800">SHIRO</h1>
             <h1 className="mb-4 text-5xl font-bold leading-tight text-gray-800">Original Wallet</h1>
             <span className="text-sm text-gray-600">
-            GITCOIN is a free, client-side interface helping you interact with the Ethereum blockchain. Our easy-to-use, open-source platform allows you to generate wallets, interact with smart contracts, and so much more.
+            SHIRO is a free, client-side interface helping you interact with the Ethereum blockchain. Our easy-to-use, open-source platform allows you to generate wallets, interact with smart contracts, and so much more.
           </span>
           </div>
         </div>
